@@ -9,19 +9,18 @@ const retakeBtn = document.querySelector("#retakeBtn");
 const downloadBtn = document.querySelector("#downloadBtn");
 
 let currIdx = 0;
-
 // Event Listner
-startBtn.addEventListener("click", () => {
+startBtn.addEventListener("click", async() => {
+  // await askAI(currIdx);
+  // currIdx++;
+  // console.log(currIdx);
   startSurvey();
-  askAI(currIdx);
-  currIdx++;
 });
 prevBtn.addEventListener("click", () => {
   previousQuestion();
 });
 nextBtn.addEventListener("click", () => {
-  nextQuestion();
-  askAI()
+  nextQuestion(currIdx);
 });
 submitBtn.addEventListener("click", () => {
   submitSurvey();
@@ -40,16 +39,25 @@ let answers = {};
 // Functions
 function startSurvey() {
   document.getElementById("welcomeScreen").classList.add("hidden");
+  console.log("working")
+  if(questions[currIdx].text !== "" && questions[currIdx].options.length != 0){
   document.getElementById("surveyScreen").classList.remove("hidden");
-  displayQuestion();
+   displayQuestion();
+   console.log("wededew")
+  }else{
+    askAI(currIdx);
+    displayQuestion();
+  }
 }
 
 function displayQuestion() {
   const question = questions[currentQuestion];
   const container = document.getElementById("questionContainer");
+  container.innerHTML = "";
 
   let html = `<div class="question-text">${question.text}</div><div class="options">`;
-
+  console.log(question)
+  
   question.options.forEach((option, index) => {
     const checked = answers[question.id] === option ? "checked" : "";
     const selected = answers[question.id] === option ? "selected" : "";
@@ -104,7 +112,7 @@ function updateButtons() {
   );
 }
 
-function nextQuestion() {
+function nextQuestion(ci) {
   if (!answers[questions[currentQuestion].id]) {
     alert("Please select an answer before proceeding!");
     console.log("why");
@@ -116,6 +124,9 @@ function nextQuestion() {
     displayQuestion();
     console.log("what");
   }
+  askAI(ci)
+  ci++;
+  console.log(ci);
 }
 
 function previousQuestion() {

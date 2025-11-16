@@ -156,10 +156,17 @@ export async function askAI(currIdx) {
     .join("\n")}
 Now, ask the next logical question for index ${
     currIdx + 1
-  }. and most important thing do not type extra rubbish just type a single sentence question, and that question must be related to user's liking, means questions know about user's passion and intrest in future. dont just go and ask irrelevant question start with basic questions and as ${currIdx++} make them related to their career and passion`;
-  const resBox = document.querySelector(".question-text");
+  }. and most important thing do not type extra rubbish just type a single sentence question, and that question must be related to user's liking, means questions know about user's passion and intrest in future. dont just go and ask irrelevant question start with basic questions and as ${currIdx + 1} make them related to their career and passion`;
+  
+  const resBox = document.createElement("div");
+  const container = document.getElementById("questionContainer");
+  resBox.classList.add("loader");
 
   resBox.textContent = "Thinking...";
+
+  container.append(resBox);
+
+  document.getElementById("surveyScreen").classList.remove("hidden");
 
   try {
     const response = await fetch("http://localhost:3000/ask", {
@@ -169,17 +176,16 @@ Now, ask the next logical question for index ${
     });
 
     const data = await response.json();
-    resBox.textContent = data.response || data.output || JSON.stringify(data);
+    const aiQues = data.response || data.output || JSON.stringify(data);
 
-    if (questions[currIdx]) {
-      questions[currIdx].text += resBox.textContent;
-      console.log(resBox.textContent);
-    }
+    questions[currIdx].text += aiQues;
+    console.log(questions[currIdx], aiQues, currIdx);
 
     await opts(currIdx);
+    currIdx++;
   } catch (err) {
     console.error(err);
-    resBox.textContent = "Failed to connect to server.";
+    questions[currIdx].text += "Failed to connect to server.";
   }
 }
 export async function opts(currIdx) {
@@ -199,9 +205,10 @@ export async function opts(currIdx) {
 
     questions[currIdx].options = aiOptions;
     console.log(aiOptions, questions[currIdx].options);
-
+    return aiOptions;
   } catch (err) {
     console.error(err);
     resBox = "Failed to connect to server.";
+    return [];
   }
 }
